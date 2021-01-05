@@ -1,0 +1,6 @@
+C:\Users\asdf\source\repos\udpserver\bin\Debug\udpserver.exe
+C:\Users\asdf\source\repos\udpserver\bin\Debug\udpserver.pdb
+C:\Users\asdf\source\repos\udpserver\obj\Debug\udpserver.csprojAssemblyReference.cache
+C:\Users\asdf\source\repos\udpserver\obj\Debug\udpserver.csproj.CoreCompileInputs.cache
+C:\Users\asdf\source\repos\udpserver\obj\Debug\udpserver.exe
+C:\Users\asdf\source\repos\udpserver\obj\Debug\udpserver.pdb

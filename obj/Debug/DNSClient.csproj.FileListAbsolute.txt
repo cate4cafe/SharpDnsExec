@@ -1,0 +1,5 @@
+C:\Users\asdf\source\repos\MySharp\DnsExec\obj\Debug\DNSClient.csproj.CoreCompileInputs.cache
+C:\Users\asdf\source\repos\MySharp\DnsExec\bin\Debug\MyDnsClient.exe
+C:\Users\asdf\source\repos\MySharp\DnsExec\bin\Debug\MyDnsClient.pdb
+C:\Users\asdf\source\repos\MySharp\DnsExec\obj\Debug\MyDnsClient.exe
+C:\Users\asdf\source\repos\MySharp\DnsExec\obj\Debug\MyDnsClient.pdb

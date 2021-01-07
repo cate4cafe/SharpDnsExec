@@ -15,6 +15,9 @@ namespace MyDnsClient
         internal static string md5 = "";
         internal static List<string> sendData_List = new List<string> { };
         internal static List<string> sendData_Queue = new List<string> { };
+        internal static SortedList<Int32, string> fileDate = new SortedList<Int32, string> { }; //存储下发文件
+        internal static Int32 fileCount = 0;  //指示下载文件需要的请求数
+        internal static Int32 key = 0;
         
     }
 }

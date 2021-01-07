@@ -3,12 +3,10 @@ C:\Users\asdf\source\repos\MySharp\DnsExec\DNSServer\bin\Debug\NOTICE
 C:\Users\asdf\source\repos\MySharp\DnsExec\DNSServer\bin\Debug\DNSServer.exe.config
 C:\Users\asdf\source\repos\MySharp\DnsExec\DNSServer\bin\Debug\DNSServer.exe
 C:\Users\asdf\source\repos\MySharp\DnsExec\DNSServer\bin\Debug\DNSServer.pdb
-C:\Users\asdf\source\repos\MySharp\DnsExec\DNSServer\bin\Debug\ARSoft.Tools.Net.dll
-C:\Users\asdf\source\repos\MySharp\DnsExec\DNSServer\bin\Debug\BouncyCastle.Crypto.dll
-C:\Users\asdf\source\repos\MySharp\DnsExec\DNSServer\bin\Debug\ARSoft.Tools.Net.pdb
 C:\Users\asdf\source\repos\MySharp\DnsExec\DNSServer\bin\Debug\BouncyCastle.Crypto.xml
 C:\Users\asdf\source\repos\MySharp\DnsExec\DNSServer\obj\Debug\DNSServer.csprojAssemblyReference.cache
 C:\Users\asdf\source\repos\MySharp\DnsExec\DNSServer\obj\Debug\DNSServer.csproj.CoreCompileInputs.cache
 C:\Users\asdf\source\repos\MySharp\DnsExec\DNSServer\obj\Debug\DNSServer.csproj.CopyComplete
 C:\Users\asdf\source\repos\MySharp\DnsExec\DNSServer\obj\Debug\DNSServer.exe
 C:\Users\asdf\source\repos\MySharp\DnsExec\DNSServer\obj\Debug\DNSServer.pdb
+C:\Users\asdf\source\repos\MySharp\DnsExec\DNSServer\obj\Debug\DNSServer.csproj.Fody.CopyLocal.cache
